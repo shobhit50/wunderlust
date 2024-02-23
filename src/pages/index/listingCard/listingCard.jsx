@@ -9,7 +9,7 @@ function ListingCard() {
         fetch(`http://localhost:3001`)
             .then(res => res.json())
             .then(allListings => {
-                console.log(allListings); // Log the data
+                console.log(allListings);
                 setData(allListings);
                 setLoading(false);
             })
