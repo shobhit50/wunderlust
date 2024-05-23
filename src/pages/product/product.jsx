@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
+import { useContext } from 'react';
 
-function Product({ _id, }) {
+function Product({ _id, isButtonClicked }) {
     const { id } = useParams();
-
-    console.log(id, ' id');
     const [loading, setLoading] = useState(true);
     const [allListings, setAllListings] = useState({});
     const [avg, setAvg] = useState(0);
-    const currUser = "shobhit"
+    const [currUser, setcurrUser] = useState(null);
+
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            setcurrUser(user);
+
+        }
+    }, []);
+
     useEffect(() => {
         fetch(`http://localhost:3001/listings/${id}`)
             .then(res => res.json())
             .then(data => {
-                console.log(data); // Log the data
                 setAllListings(data.allListings);
                 setAvg(data.avg);
                 setLoading(false);
@@ -83,7 +92,7 @@ function Product({ _id, }) {
                                 <p style={{ margin: 0 }}>18% tax +</p>
                                 <hr />
                                 <h6>Total After taxes: ₹{(allListings.price * (18 / 100) + allListings.price).toLocaleString("en-in")}</h6>
-                                {currUser && (allListings.owner._id === currUser._id || currUser.isAdmin) && (
+                                {currUser && (allListings.owner._id === currUser.id || currUser.isAdmin) && (
                                     <div className="delete-btn">
                                         <a href={`/listings/Edit/${allListings._id}`} className="btn btn-primary show-btn">Edit</a>
                                         <button type="submit" className="btn btn-primary">Delete</button>

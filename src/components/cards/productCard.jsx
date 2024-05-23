@@ -1,14 +1,19 @@
 import React from 'react';
+import { useContext } from 'react';
+import ButtonContext from '../context/Buttoncontext';
+import { useEffect } from 'react';
 
 function ProductCard({ listing }) {
-    console.log("working")
+    const { isButtonClicked } = useContext(ButtonContext);
+
+    useEffect(() => {
+    }, [listing]);
+
     const calculateAverageRating = (reviews) => {
-        console.log(reviews, 'here are all reviews')
         if (!reviews || reviews.length === 0) return 0;
         const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
         return parseFloat((totalRating / reviews.length).toFixed(2));
     }
-    console.log(listing?.image?.url, 'listing')
     return (
         <div className="row row-cols-lg-3 row-cols-lg-2 row-cols-lg-1 mt-5" style={{ justifyContent: 'center' }}>
             <div className="listingdata">
@@ -25,7 +30,7 @@ function ProductCard({ listing }) {
                                     {listing.price !== null && typeof listing.price === 'number' ? (
                                         <>
                                             ₹{listing.price.toLocaleString("en-in")} / night
-                                            <i className="taxe-icon">&nbsp; +18%tax</i>
+                                            {isButtonClicked && <i>&nbsp; +18%tax</i>}
                                             <i style={{
                                                 background: 'linear-gradient(137deg, rgb(255 255 255) 9%, rgb(205 205 205 / 50%) 100%)',
                                                 backdropFilter: 'blur(2px)',

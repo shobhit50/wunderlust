@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function NavBar({ currUser }) {
+function NavBar() {
+    const navigate = useNavigate();
     const toggleDropdown = (dropdownId) => {
         var dropdown = document.getElementById(dropdownId);
         if (dropdown.style.display === "block") {
@@ -20,6 +23,38 @@ function NavBar({ currUser }) {
         }
     });
 
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            setUsername(user.username);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (username) {
+            console.log('user already logged in', username);
+        }
+    }, [username]);
+
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.get('http://localhost:3001/logout');
+            localStorage.removeItem('user');
+
+            console.log('logout success');
+            navigate('/');
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+
     return (
         <nav className="navbar navbar-expand-md bg-body-tertiary  border-bottom sticky-top">
             <div className="container-fluid">
@@ -38,7 +73,7 @@ function NavBar({ currUser }) {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav" style={{ width: '100%', alignItems: 'center' }}>
                         <li className="nav-item">
-                            <a className="nav-link" href="/listings">Explore</a>
+                            <Link className="nav-link" to="/listings">Explore</Link>
                         </li>
 
                         <li className="nav-item navbar-nav ms-auto" id="search-nav">
@@ -52,27 +87,27 @@ function NavBar({ currUser }) {
                         </li>
 
                         <div className="navdrop">
-                            {currUser && <p className="drop"><i className="fa-regular fa-circle-user"></i>{currUser.username}</p>}
+                            {username && <p className="drop"><i className="fa-regular fa-circle-user"></i> {username}</p>}
                         </div>
 
                         <li className="nav-item navbar-nav ms-auto" id="nav-item" style={{ alignItems: 'center' }}>
-                            <a className="nav-link" href="/listings/new">Airbnb your home</a>
-                            {!currUser && <a className="nav-link " aria-current="page" href="/signup"> <b>SignUp</b></a>}
-                            {!currUser && <a className="nav-link" href="/login"> <b>Login</b></a>}
+                            <Link to="/listings/new" className="nav-link">Airbnb your home</Link>
+                            {!username && <Link className="nav-link " aria-current="page" to="/signup"> <b>SignUp</b></Link>}
+                            {!username && <Link className="nav-link" to="/login"> <b>Login</b></Link>}
 
-                            {currUser &&
+                            {username &&
                                 <div className="navdrop2">
-                                    <p className="drop" onClick={() => toggleDropdown('userDropdown')}><i className="fa-regular fa-circle-user"></i>{currUser.username}</p>
+                                    <p className="drop" onClick={() => toggleDropdown('userDropdown')}><i className="fa-regular fa-circle-user"></i> {username}</p>
                                     <div className="dropdown" id="userDropdown">
-                                        <a className="nav-link" href="/listings/new">Airbnb your home</a>
+                                        <Link to="/listings/new" className="nav-link">Airbnb your home</Link>
                                         <hr />
-                                        <a className="nav-link" href="/logout"><b></b>LogOut</a>
+                                        {username && <Link className="nav-link" onClick={handleLogout}><b></b>LogOut</Link>}
                                     </div>
                                 </div>
                             }
 
                             <div className="navdrop">
-                                {currUser && <a className="nav-link" href="/logout"><b></b>LogOut</a>}
+                                {username && <a className="nav-link" onClick={handleLogout}><b></b>LogOut</a>}
                             </div>
                         </li>
                     </ul>

@@ -1,7 +1,20 @@
-import React from "react";
-
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function NewListing() {
+    const [username, setUsername] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            setUsername(user.username);
+        } else {
+            navigate('/login');
+        }
+    }, [history]);
+
 
     return (
         <>
